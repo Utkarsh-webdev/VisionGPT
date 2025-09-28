@@ -8,7 +8,7 @@ const Credits = () => {
 
   const [plans, setPlans] = useState([])
   const [loading, setLoading] = useState(true)
-  const { token, axios, theme } = useAppContext()
+  const { token, axios } = useAppContext()
 
   const fetchPlans = async () => {
     try {
@@ -27,6 +27,7 @@ const Credits = () => {
   }
 
   const purchasePlan = (planId) => {
+    // Return the promise so toast.promise can track it
     return axios.post('/api/credit/purchase', { planId }, { headers: { Authorization: token } })
       .then(({ data }) => {
         if (data.success) {
@@ -53,45 +54,40 @@ const Credits = () => {
         {plans.map((plan) => (
           <div
             key={plan._id}
-            className={`rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 min-w-[300px] flex flex-col
-              ${
-                theme === "dark"
-                  ? "bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 border border-purple-700"
-                  : "bg-white border border-gray-200"
-              }
-            `}
+            className={`border border-gray-200 dark:border-purple-700 rounded-lg shadow hover:shadow-lg transition-shadow p-6 min-w-[300px] flex flex-col ${
+              plan._id === "pro"
+                ? "bg-purple-50 dark:bg-purple-900"
+                : "bg-white dark:bg-transparent"
+            }`}
           >
             <div className="flex-1">
-              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {plan.name}
               </h3>
-
               <p className="text-2xl font-bold text-purple-600 dark:text-purple-300 mb-4">
                 ${plan.price}
-                <span className="text-base font-normal text-gray-600 dark:text-gray-300 ml-1">
-                  / {plan.credits} credits
+                <span className="text-base font-normal text-gray-600 dark:text-purple-200">{' '}/
+                  {plan.credits} credits
                 </span>
               </p>
-
-              <ul className="list-disc list-inside text-sm space-y-1 text-gray-700 dark:text-gray-300">
+              <ul className="list-disc list-inside text-sm text-gray-700 dark:text-purple-200 space-y-1">
                 {plan.features.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
             </div>
-
             <button
               onClick={() =>
                 toast.promise(
                   purchasePlan(plan._id),
                   {
-                    pending: "Processing...",
-                    success: "Redirecting...",
-                    error: "Purchase failed",
+                    pending: 'Processing...',
+                    success: 'Redirecting...',
+                    error: 'Purchase failed'
                   }
                 )
               }
-              className="mt-6 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium py-2 rounded-lg transition-colors"
+              className="mt-6 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium py-2 rounded transition-colors cursor-pointer"
             >
               Buy Now
             </button>
