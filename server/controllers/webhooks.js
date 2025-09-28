@@ -20,8 +20,13 @@ export const stripeWebhooks = async (request, response) => {
 
     try {
         switch (event.type) {
-            case "checkout.session.completed": {
-                const session = event.data.object;
+            case "payment_intent.succeeded": {
+                const paymentIntent = event.data.object;
+                const sessionList = await stripe.checkout.sessions.list({
+                    payment_intent: paymentIntent.id,
+                });
+
+                const session = sessionList.data[0];
                 const { transactionId, appId } = session.metadata;
 
                 if (appId === "quickgpt") {
@@ -34,8 +39,7 @@ export const stripeWebhooks = async (request, response) => {
                         // Update credits in user account
                         await User.updateOne(
                             { _id: transaction.userId },
-                            { $inc: { credit: transaction.credits } }
-
+                            { $inc: { credit: transaction.credits } } // fixed field name
                         );
 
                         // Update credit Payment status
@@ -57,7 +61,7 @@ export const stripeWebhooks = async (request, response) => {
         }
         response.json({ received: true });
     } catch (error) {
-        console.error(error);
+        console.error(error); // fixed console
         return response.status(500).send("Internal Server Error");
     }
 };

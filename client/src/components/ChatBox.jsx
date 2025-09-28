@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useAppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import Message from "./Message";  // adjust path if needed
+import { toast } from 'react-hot-toast';
 
 
 const ChatBox = () => {
 
   const containerRef = useRef(null)
 
-  const {selectedChat, theme} = useAppContext()
+  const {selectedChat, theme, user, axios, token, setUser} = useAppContext()
 
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -18,8 +19,49 @@ const ChatBox = () => {
   const [isPublished, setIsPublished] = useState(false)
 
   const onSubmit = async (e) => {
-  e.preventDefault();
-};
+    try {
+      e.preventDefault();
+      if (!user) return toast('Login to send message');
+      setLoading(true);
+
+      const promptCopy = prompt;
+      setPrompt('');
+
+      setMessages(prev => [
+        ...prev,
+        { role: 'user', content: prompt, timestamp: Date.now(), isImage: false }
+      ])
+
+      const { data } = await axios.post(`/api/message/${mode}`, {
+        chatId: selectedChat._id,
+        prompt,
+        isPublished
+      }, {
+        headers: {
+          Authorization: token,
+        },
+      })
+
+      if(data.success){
+        setMessages(prev => [...prev, data.reply])
+        // decrease credits
+        if (mode === 'image'){
+          setUser(prev => ({...prev, credits: prev.credits - 2}))
+        } else {
+          setUser(prev => ({...prev, credits: prev.credits - 1}))
+        }
+      } else{
+        toast.error(data.message)
+        setPrompt(promptCopy)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    } finally{
+      setPrompt('')
+      setIsPublished(false)
+      setLoading(false)
+    }
+  };
 
 
   useEffect(()=> {
@@ -51,7 +93,7 @@ const ChatBox = () => {
 
         {messages.map((message, index)=> <Message key={index} message={message} />)}
 
-        {/* Three DOts Loading */}
+        {/* Three Dots Loading */}
         {
           loading && <div className='loader flex items-center gap-1.5'>
             <div className='w-1.5 h-1.5 rounded-full bg-gray-500 dark:bg-white animate-bounce'></div>
@@ -65,7 +107,7 @@ const ChatBox = () => {
         <label className='inline-flex items-center gap-2 mb-3 text-sm mx-auto'>
           <p className='text-xs'>Publish Generated Image to Community</p>
           <input type='checkbox' className='cursor-pointer' checked={isPublished} 
-          onChange={(e)=>setaIsPublished(e.target.checked)}/>
+          onChange={(e)=>setIsPublished(e.target.checked)}/>
         </label>
       )}
 
