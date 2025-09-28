@@ -135,20 +135,23 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
               </div>
 
               {/* Delete Button */}
-              <button
-                onClick={(e) =>
-                  toast.promise(deleteChat(e, chat._id), {
-                    loading: "Deleting...",
-                  })
-                }
-                className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200"
-              >
-                <img
-                  src={assets.bin_icon}
-                  className="w-4 cursor-pointer not-dark:invert"
-                  alt="Delete chat"
-                />
-              </button>
+              {/* Delete Button */}
+<button
+  onClick={(e) =>
+    toast.promise(deleteChat(e, chat._id), {
+      loading: "Deleting...",
+    })
+  }
+  className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200
+    opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+>
+  <img
+    src={assets.bin_icon}
+    className="w-4 cursor-pointer not-dark:invert"
+    alt="Delete chat"
+  />
+</button>
+
             </div>
           ))}
       </div>
