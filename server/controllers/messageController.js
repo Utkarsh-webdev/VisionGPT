@@ -2,59 +2,78 @@ import Chat from "../models/Chat.js";
 import axios from "axios";
 import imagekit from "../configs/imageKit.js";
 import User from "../models/User.js";
-import openai from "../configs/openai.js";
+import ai from "../configs/gemini.js";
 
-// Text-based AI Chat Message Controller
+// ===============================
+// TEXT MESSAGE CONTROLLER
+// ===============================
 export const textMessageController = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Check credits
     if (req.user.credits < 1) {
-      return res.json({
+      return res.status(400).json({
         success: false,
-        message: "You don't have enough credits to use this feature"
+        message: "You don't have enough credits",
       });
     }
 
     const { chatId, prompt } = req.body;
 
-    const chat = await Chat.findOne({ userId, _id: chatId });
+    const chat = await Chat.findOne({
+      _id: chatId,
+      userId,
+    });
+
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        message: "Chat not found",
+      });
+    }
+
     chat.messages.push({
       role: "user",
       content: prompt,
       timestamp: Date.now(),
-      isImage: false
+      isImage: false,
     });
 
-    const { choices } = await openai.chat.completions.create({
-      model: "gemini-2.0-flash",
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ]
+    // Gemini Response
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
     });
 
     const reply = {
       role: "assistant",
-      content: choices[0].message.content,
+      content: response.text,
       timestamp: Date.now(),
-      isImage: false
+      isImage: false,
     };
 
-    res.json({ success: true, reply });
-
     chat.messages.push(reply);
+
     await chat.save();
 
-    await User.updateOne({ _id: userId }, { $inc: { credits: -1 } });
+    await User.findByIdAndUpdate(userId, {
+      $inc: { credits: -1 },
+    });
+
+    return res.json({
+      success: true,
+      reply,
+    });
+
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
-
 // Image Generation Message Controller
 export const imageMessageController = async (req, res) => {
   try {
