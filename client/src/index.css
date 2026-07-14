@@ -1,0 +1,144 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import "tailwindcss";
+
+/* FIX: the trailing `*` is required so the dark variant matches descendants
+   of .dark, not just an element that literally carries the class itself.
+   Without it, every `dark:` utility in the app silently does nothing. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand — matched to the logo mark's own blue -> violet gradient */
+  --color-primary: #8B5CF6;
+  --color-primary-deep: #4C3BCF;
+  --color-accent-blue: #4080F6;
+  --color-accent-cyan: #22D3EE;
+  --color-accent-gold: #F5B948;
+  --color-danger: #FB5B6B;
+
+  /* Surfaces */
+  --color-canvas: #FAFAFE;
+  --color-canvas-dark: #0A0913;
+  --color-surface: #FFFFFF;
+  --color-surface-dark: #15121F;
+  --color-surface-alt: #F3F1FB;
+  --color-surface-alt-dark: #1C1830;
+
+  /* Ink */
+  --color-ink: #16132A;
+  --color-ink-dark: #EFEDFB;
+  --color-ink-dim: #6E6785;
+  --color-ink-dim-dark: #9C95BC;
+
+  /* Type */
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* {
+  font-family: var(--font-sans);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-canvas);
+}
+
+.dark body {
+  background-color: var(--color-canvas-dark);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Slim themed scrollbar instead of a hidden one, for discoverability */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Markdown/AI reply content should not inherit Tailwind's prose resets */
+.reset-tw :not(pre):not(code) {
+  all: revert;
+}
+
+/* Signature gradient mesh used behind the brand panel + loading screen */
+.mesh {
+  background-image:
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--color-accent-blue) 55%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--color-accent-cyan) 35%, transparent), transparent 50%),
+    radial-gradient(circle at 50% 90%, color-mix(in srgb, var(--color-primary) 65%, transparent), transparent 55%),
+    linear-gradient(160deg, #100A26, #050310 70%);
+}
+
+.text-gradient {
+  background-image: linear-gradient(90deg, var(--color-accent-blue), var(--color-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-brand-gradient {
+  background-image: linear-gradient(90deg, var(--color-accent-blue), var(--color-primary));
+}
+
+@keyframes spark-spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spark {
+  animation: spark-spin 2.4s linear infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+.loader div:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.loader div:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
