@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import moment from "moment";
+import logo_full from "../assets/logo_full.jpg";
+import logo_full_dark from "../assets/logo_full_dark.png";
 import toast from "react-hot-toast";
 
 const initials = (name = "") =>
@@ -81,7 +83,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
         {/* Header */}
         <div className="flex items-center justify-between px-1 mb-5">
           <img
-            src={theme === "dark" ? assets.logo_full : assets.logo_full_dark}
+            src={theme === "dark" ? logo_full : logo_full_dark}
             alt="QuickGPT"
             className="w-32"
           />
