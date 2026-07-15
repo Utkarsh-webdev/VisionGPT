@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import moment from "moment";
-import logo_full from "../assets/logo_full.jpg";
-import logo_full_dark from "../assets/logo_full_dark.png";
 import toast from "react-hot-toast";
 
 const initials = (name = "") =>
@@ -83,7 +81,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
         {/* Header */}
         <div className="flex items-center justify-between px-1 mb-5">
           <img
-            src={theme === "dark" ? logo_full : logo_full_dark}
+            src={theme === "dark" ? assets.logo_full : assets.logo_full_dark}
             alt="QuickGPT"
             className="w-32"
           />
@@ -96,7 +94,25 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
           </button>
         </div>
 
+        {/* New Chat Button */}
+        <button
+          onClick={createNewChat}
+          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 text-white text-sm font-medium bg-brand-gradient rounded-xl shadow-md shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all"
+        >
+          <span className="text-base leading-none">+</span> New chat
+        </button>
 
+        {/* Search */}
+        <div className="flex items-center gap-2.5 px-3 py-2.5 mt-4 bg-surface-alt dark:bg-surface-alt-dark rounded-xl">
+          <img src={assets.search_icon} className="w-3.5 opacity-50 not-dark:invert" alt="" />
+          <input
+            onChange={(e) => setSearch(e.target.value)}
+            type="text"
+            value={search}
+            placeholder="Search chats"
+            className="flex-1 text-sm bg-transparent outline-none placeholder-ink-dim dark:placeholder-ink-dim-dark min-w-0"
+          />
+        </div>
 
         {/* Recent Chats */}
         {filteredChats.length > 0 && (
